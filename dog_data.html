@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dog Data</title>
+</head>
+<body>
+
+  <h1>Dog Breeds</h1>
+  <ul id="breeds-list"></ul>
+  <div id="breed-details"></div>
+
+  <h2>Random Dog Fact</h2>
+  <div id="fact-container"></div>
+
+  <h2>Dog Groups</h2>
+  <div id="groups-container"></div>
+
+  <script>
+    // Fetch dog breeds
+    fetch('https://dogapi.dog/api/v2/breeds')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Dog Breeds:', data);
+
+        const breedsList = document.getElementById('breeds-list');
+
+        if (data.data && data.data.length > 0) {
+          data.data.forEach(breed => {
+            const listItem = document.createElement('li');
+            listItem.textContent = breed.attributes.name;
+            listItem.addEventListener('click', () => displayBreedDetails(breed.id));
+            breedsList.appendChild(listItem);
+          });
+        } else {
+          console.log('Dog Breeds: No breeds available');
+          breedsList.textContent = 'Dog Breeds: No breeds available';
+        }
+      })
+      .catch(error => {
+        console.error('Fetch Error (Dog Breeds):', error);
+      });
+
+    // Display details of a specific breed
+    function displayBreedDetails(id) {
+    // Fetch details of a specific breed by ID
+      fetch(`https://dogapi.dog/api/v2/breeds/${id}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(breedData => {
+          console.log('Breed Details:', breedData);
+
+          const breedDetailsContainer = document.getElementById('breed-details');
+
+          const detailsHTML = `
+            <h3>${breedData.data.attributes.name}</h3>
+            <p>${breedData.data.attributes.description}</p>
+          `;
+
+          breedDetailsContainer.innerHTML = detailsHTML;
+        })
+        .catch(error => {
+          console.error('Fetch Error (Breed Details):', error);
+        });
+    }
+
+    // Fetch random dog fact
+    fetch('https://dogapi.dog/api/v2/facts')
+      .then(response => response.json())
+      .then(data => {
+        console.log('Random Dog Fact:', data.data[0].attributes.body);
+        const factContainer = document.getElementById('fact-container');
+        factContainer.textContent = `Random Dog Fact: ${data.data[0].attributes.body}`;
+      })
+      .catch(error => {
+        console.error('Fetch Error (Random Dog Fact):', error);
+      });
+
+    // Fetch dog groups
+    fetch('https://dogapi.dog/api/v2/groups')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Dog Groups Response:', data);
+
+        const groupsContainer = document.getElementById('groups-container');
+
+        if (data.data && data.data.length > 0) {
+          const groups = data.data.map(group => group.attributes.name).join(', ');
+          console.log('Dog Groups:', groups);
+          groupsContainer.textContent = `Dog Groups: ${groups}`;
+        } else {
+          console.log('No groups available');
+          groupsContainer.textContent = 'Dog Groups: No groups available';
+        }
+      })
+      .catch(error => {
+        console.error('Fetch Error (Dog Groups):', error);
+      });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
